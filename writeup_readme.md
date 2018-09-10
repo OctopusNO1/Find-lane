@@ -111,7 +111,7 @@ Here's a [link to my video result](./output_videos/result_project_video.mp4)
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  
 
 There are two main problems I faced in this project:  
-1.adjust the color and gradient threshold to get a binary image with clear lane and eliminate other interference as much as possible.  
+1.adjust the color and gradient threshold to get a binary image with clear lane and eliminate other interference.  
 2.build a pipeline to find enough pixels for fitting lines
 
 #### 2. Where will your pipeline likely fail?  What could you do to make it more robust?
