@@ -453,10 +453,10 @@ def get_real_curvature_offset(left_fit, right_fit, y_eval=720):
     # convert polynomials coefficient from the pixels' to meters'
     a_left_fit_cr = xm_per_pix / (ym_per_pix ** 2) * left_fit[0]
     b_left_fit_cr = xm_per_pix / ym_per_pix * left_fit[1]
-    c_left_fit_cr = left_fit[2]
+    c_left_fit_cr = xm_per_pix * [2]
     a_right_fit_cr = xm_per_pix / (ym_per_pix ** 2) * right_fit[0]
     b_right_fit_cr = xm_per_pix / ym_per_pix * right_fit[1]
-    c_right_fit_cr = right_fit[2]
+    c_right_fit_cr = xm_per_pix * right_fit[2]
 
     # Define y-value where we want radius of curvature
     # We'll choose the maximum y-value, corresponding to the bottom of the image
