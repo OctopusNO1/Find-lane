@@ -99,8 +99,8 @@ Here is an example of my result on a test image:
 First, we can search around last frame's fit.  If it can't work well, reset to slide window.  
 If slide window can't work well, we can use last frame's pixels to get a approximate result.  
 #### 3. Fit polynomial and sanity  check 
-I compare this fit and last frame's fit, they should have similar curvature.  If this fit isn't sanity,  
-we can use the average fit to get a approximate result.  
+I compare this fit and last frame's fit, they should have similar curvature.  
+If this fit isn't sanity, we can use the average fit to get a approximate result.  
 
 Here's a [link to my video result](./output_videos/result_project_video.mp4)
 
@@ -111,11 +111,11 @@ Here's a [link to my video result](./output_videos/result_project_video.mp4)
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  
 
 There are two main problems I faced in this project:  
-1.adjust the color and gradient threshold to get a binary image with clear lane and eliminate other interference as much as possible.
+1.adjust the color and gradient threshold to get a binary image with clear lane and eliminate other interference as much as possible.  
 2.build a pipeline to find enough pixels for fitting lines
 
 #### 2. Where will your pipeline likely fail?  What could you do to make it more robust?
 
-My pipeline may fail at two steps: create threshold image, find lane pixels.
+My pipeline may fail at two steps: create threshold image, find lane pixels.  
 I can adjust the color and gradient threshold to get a binary image with clear lane and eliminate other interference.
 
