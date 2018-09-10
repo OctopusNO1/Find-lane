@@ -453,7 +453,7 @@ def get_real_curvature_offset(left_fit, right_fit, y_eval=720):
     # convert polynomials coefficient from the pixels' to meters'
     a_left_fit_cr = xm_per_pix / (ym_per_pix ** 2) * left_fit[0]
     b_left_fit_cr = xm_per_pix / ym_per_pix * left_fit[1]
-    c_left_fit_cr = xm_per_pix * [2]
+    c_left_fit_cr = xm_per_pix * left_fit[2]
     a_right_fit_cr = xm_per_pix / (ym_per_pix ** 2) * right_fit[0]
     b_right_fit_cr = xm_per_pix / ym_per_pix * right_fit[1]
     c_right_fit_cr = xm_per_pix * right_fit[2]
@@ -577,34 +577,32 @@ def image_pipeline(image):
     warped_image = region_of_interest(perspective_transform(binary_image))
 
     ## find enough line pixels(around last-->slide window-->use last)
-    left_line = Line()
-    right_line = Line()
     # had detected two lines from last frame-->around last
     if left_line.detected and right_line.detected:
         leftx, lefty, rightx, righty, out_img = \
             find_lane_pixels_around(warped_image, left_line.current_fit, right_line.current_fit)
         # not detect enough lines pixels, back to slide window
-        if (len(leftx) < 1000) or (len(rightx) < 1000):
+        if (len(leftx) < 500) or (len(rightx) < 500):
             leftx, lefty, rightx, righty, out_img = find_lane_pixels_first(warped_image)
     else:   # slide window when first detect or not detected two lines from last frame
         leftx, lefty, rightx, righty, out_img = find_lane_pixels_first(warped_image)
     # mark when detect enough lines pixels
-    if len(leftx) > 1000:
+    if len(leftx) > 500:
         left_line.detected = True
         left_line.allx = leftx
         left_line.ally = lefty
     else:   # use last frame's find pixels when not detect enough lines pixels
-        left_line.detected = True
+        left_line.detected = False
         leftx = left_line.allx
         lefty = left_line.ally
-    if len(rightx) > 1000:
+    if len(rightx) > 500:
         right_line.detected = True
         right_line.allx = rightx
         right_line.ally = righty
     else:
-        right_line.detected = True
-        rightx = left_line.allx
-        righty = left_line.ally
+        right_line.detected = False
+        rightx = right_line.allx
+        righty = right_line.ally
 
     ## fit sanity polynomial(check this and last-->best/average fit)
     left_fit, right_fit = fit_polynomial(leftx, lefty, rightx, righty)
@@ -619,21 +617,27 @@ def image_pipeline(image):
         left_line.detected = False
     else:   # mark when new fit is sanity
         left_line.current_fit = left_fit
+        left_line.detected = True
+
+        # compute average fit
         left_line.all_fit.append(left_line.current_fit)
-        avg = np.array([0, 0, 0], dtype='float')
+        sum_fit = np.array([0, 0, 0], dtype='float')
         for element in left_line.all_fit:
-            avg = avg + element
-        left_line.best_fit = avg / (len(left_line.all_fit))
+            sum_fit += element
+        left_line.best_fit = sum_fit / (len(left_line.all_fit))
     if abs(right_line.current_fit[1] - right_fit[1]) > 0.18:  # use average/best fit when new line aren't sanity
         right_line.current_fit = right_line.best_fit
         right_line.detected = False
     else:   # mark when new fit is sanity
         right_line.current_fit = right_fit
+        right_line.detected = True
+
+        # compute average fit
         right_line.all_fit.append(right_line.current_fit)
-        avg = np.array([0, 0, 0], dtype='float')
+        sum_fit = np.array([0, 0, 0], dtype='float')
         for element in right_line.all_fit:
-            avg = avg + element
-        left_line.best_fit = avg / (len(right_line.all_fit))
+            sum_fit += element
+        right_line.best_fit = sum_fit / (len(right_line.all_fit))
 
     warp_back_image = warp_back(undist_image, warped_image, left_fit, right_fit)
     result_image = visual_result(warp_back_image, left_fit, right_fit, out_img)
@@ -642,6 +646,8 @@ def image_pipeline(image):
 
 
 save_mtx_dist()
+left_line = Line()
+right_line = Line()
 image = mpimg.imread('test_images/test1.jpg')
 result_image = image_pipeline(image)
 plot_two(image, result_image, 'result image')
